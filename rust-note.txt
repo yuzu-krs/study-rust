@@ -1,0 +1,1574 @@
+1章
+-rustのパッケージを作る
+cargo new パッケージ名
+
+fn main() {
+    println!("Hello, world!");
+}
+
+
+3章 変数と可変
+rustの変数は基本不変である。これを束縛という
+標準でconstやfinal
+
+fn main(){
+    let x=5;
+    println!("The value of x is:{}",x);
+    x=6; //エラー
+    println!("The value of x is:{}",x);
+}
+
+mut(ミュータブル)を使うと可変になる。
+fn main(){
+    let mut x=5;
+    println!("The value of x is:{}",x);
+    x=6;
+    println!("The value of x is:{}",x);
+}
+
+-不変を目的のconstを使うこともできる。
+-コンパイルの時点で値が決まっている。よりマジックナンバー向き
+const PIE:usize=3;
+
+-シャドーウィング 
+-yの宣言を何回もできること。シャドーウィング
+fn main(){
+    let y:i32=5; //5
+    let y:i32=y+1;//6
+    {
+        let y:i32=y*2;//12
+        println!("The value of y in the inner scope is:{} ",y); //12
+    }
+    println!("The value of y in the inner scope is:{} ",y); //6
+}
+
+-シャドーウィングで型の変換をすることもできる。
+fn main(){
+    let some_strings="aaa";
+    println!("The value of spaces is:{}",some_strings);
+
+    let some_strings=some_strings.len();
+    println!("The value of spaces is:{}",some_strings);
+}
+
+-mutをつけると再代入なので、型によるエラーが出る。
+fn main(){
+    let mut some_strings="aaa";
+    println!("The value of spaces is:{}",some_strings);
+
+    let some_strings=some_strings.len();
+    println!("The value of spaces is:{}",some_strings);
+}
+
+-型注釈
+let mut x:i32=5; //i32など プラグインで書いてくれる。
+
+符号あり,符号なし
+8bit i8 u8 //以下同様
+16
+32
+64
+arch isize usize //最適な型を自動で
+
+-整数リテラル
+10進数 98_222
+16     0xff
+8      0o77
+2      0b1111_0000
+byte(u8) b'A'
+
+-基本的な演算は同じ(違う型どうしは基本的無理) asで解決
+fn main(){
+    let x:usize=6;
+    let y:f64=1.5;
+    let z:f64 =(x as f64)/y;
+}
+
+-char型
+let c='z';
+
+-複合型(タプル)
+fn main(){
+    let tup:(i32,f64,u8)=(500,6.4,1);
+    let (x,y,z)=tup;
+    println!("{}",y);
+}
+
+-.0.1.2でタプルを取り出すことも可
+fn main() {
+    let x: (i32, f64, u8) = (500, 6.4, 1);
+
+    let five_hundred = x.0; //500
+
+    let six_point_four = x.1; //6.4
+
+    let one = x.2; //1
+}
+
+-配列 変えることはできない
+fn main(){
+    let a=[1,2,3,4,5];
+    let first = a[0]; //言語ともに同じ感じ
+}
+
+-配列 型を決める
+let a:[i32;5]=[1,2,3,4,5];
+
+-配列 3で初期化
+let a=[3;5]; //3,3,3,3,3
+
+-配列の外を参照するとパニックでプログラムを強制終了
+
+
+-第4章 関数
+-main関数の後でも実行可能
+fn main(){
+    println!("Hello,world!");
+    another_function();
+}
+    
+fn another_function(){
+    println!("Another function");
+}
+
+-引数-1
+fn main(){
+    another_function(5);
+}
+    
+fn another_function(x:i32){
+    println!("{}",x);
+}
+
+-引数-2
+fn main(){
+    another_function(5,'h');
+}
+    
+fn another_function(x:i32,unit_label:char){
+    println!("{}{}",x,unit_label);
+}
+
+-戻り値
+-x+1はセミコロンがないため、x+1の4が戻り値
+fn main(){
+    let y={
+        let x=3;
+        x+1
+    };
+    println!("{}",y);
+}
+
+-関数の戻り値
+fn five() ->i32{
+    5
+}
+fn main(){
+    let x=five();
+    println!("The value of x is:{}",x);
+}
+
+
+-関数の引数&戻り値
+fn main(){
+    let x=plus_one(5);
+    println!("The value of x is:{}",x);
+}
+
+fn plus_one(x:i32)->i32{
+    x+1
+}
+
+
+-制御フロー
+fn main(){
+    let number=3;
+    if number < 5{
+        println!("condition was true");
+    }else{
+        println!("condition was false");
+    }
+}
+
+//これは使える。
+if number != 0{ 
+
+}
+
+-制御フローの制約bool型でなければならない
+fn main(){
+    let number=3;
+    if number { //エラー
+        println!("number was three");
+    }
+}
+
+-if-else
+if ~~{
+
+}else if ~~{
+
+}else{
+
+}
+
+-ifは式なので、束縛(代入)することができる。
+fn main(){
+    let condition=true;
+    let number =if condition {5} else {6};
+}
+
+-注意 ifの戻り値は同じ型であること
+fn main(){
+    let condition=true;
+    let number =if condition {5} else {"six"}; //エラー
+}
+
+-ループ
+
+-無限ループ
+fn main(){
+    loop{
+        break; //抜ける
+    }
+}
+
+-無限ループ(1段階上のループを抜ける)
+fn main(){
+    'counting : loop{
+        loop{
+            break 'counting; //countingまで抜ける
+        }
+    }
+}
+
+-while
+fn main(){
+    let a=[10,20,30,40,50];
+    let mut index=0;
+
+    while index<5{
+        println!("{}",a[index]);
+        index+=1;
+    }
+}
+
+-for文-配列
+fn main(){
+    let a=[10,20,30,40,50];
+    for element in a{
+        println!("The value is:{}",element);
+    }
+}
+
+-for文-普通
+fn main(){
+    for elm in 0..5{ //0<=elm<5
+        println!("{}",elm);
+    }
+}
+
+-第5章 所有権
+
+-スタック宣言した近くのaddressに格納 小さい値を格納する
+-ヒープ OSさんに領域をメモリを確保してもらう OSにメモリ領域をいらないと言わなきゃダメ
+
+-Rustの各値は所有者と呼ばれる。
+-いかなるときも所有者は1つ。
+-所有者がスコープから外れたら、値を破棄される。
+fn main(){
+    {
+        let s="hello"; //sが"hello"を「所有している」
+        println!("{}",s);
+    }
+    println!("{}",s); //エラー
+}
+
+-string型は可変することができる。 let s="hello"は不変
+-string型はヒープ領域に確保 Rustはブロックを抜けるとメモリ解放する
+fn main(){
+    let mut s=String::from("hello");
+    s.push_str(", world");
+    println!("{}",s); //hello worldと表示される
+}//メモリをOSに返す
+
+-ムーブ s1がs2にムーブしたので、s1は使えない
+fn main(){
+    let s1=String::from("hello");
+    let s2=s1;
+    println!("{}",s1); //エラー
+}
+
+-メモリ領域をコピーすることで上記の問題を解決
+fn main(){
+    let s1=String::from("hello");
+    let s2=s1.clone();
+    println!("{},{}",s1,s2);
+}
+
+-スタック領域は小さい領域と分かっているので、コピーしている
+let x=5;
+let y=x;
+
+-関数の場合も同じ
+fn main() {
+    let s = String::from("hello");  // sがスコープに入る
+
+    takes_ownership(s);// sの値が関数にムーブされ...
+                                    // ここでは、sは使えない
+
+    let x = 5;                      // xがスコープに入る
+    makes_copy(x);         // xも関数にムーブされるが、
+                                    // i32はCopyなので、この後にxを使っても
+                                    // 大丈夫
+
+} // ここでxがスコープを抜け、sもスコープを抜ける。ただし、sの値はムーブされているので、何も特別なことは起こらない。
+
+fn takes_ownership(some_string: String) { // some_stringがスコープに入る。
+    println!("{}", some_string);
+} // ここでsome_stringがスコープを抜け、`drop`が呼ばれる。後ろ盾してたメモリが解放される。
+
+fn makes_copy(some_integer: i32) { // some_integerがスコープに入る
+    println!("{}", some_integer);
+} // ここでsome_integerがスコープを抜ける。何も特別なことはない。
+
+-上記の解決策
+fn main() {
+    let s1 = gives_ownership();         // gives_ownershipは、戻り値をs1に
+                                        // ムーブする
+
+    let s2 = String::from("hello");     // s2がスコープに入る
+
+    let s3 = takes_and_gives_back(s2);  // s2はtakes_and_gives_backにムーブされ
+                                        // 戻り値もs3にムーブされる
+} // ここで、s3はスコープを抜け、ドロップされる。s2もスコープを抜けるが、ムーブされているので、
+  // 何も起きない。s1もスコープを抜け、ドロップされる。
+
+fn gives_ownership() -> String {             // gives_ownershipは、戻り値を
+                                             // 呼び出した関数にムーブする
+
+    let some_string = String::from("hello"); // some_stringがスコープに入る
+
+    some_string                              // some_stringが返され、呼び出し元関数に
+    // ムーブされる
+}
+
+// takes_and_gives_backは、Stringを一つ受け取り、返す。
+fn takes_and_gives_back(a_string: String) -> String { // a_stringがスコープに入る。
+    a_string  // a_stringが返され、呼び出し元関数にムーブされる
+}
+
+-毎回返すのはめんどくさいので参照と借用
+
+-5章の1節 参照と借用
+
+fn main() {
+  let s1 = String::from("hello");
+
+  //あくまでs1を貸している&
+  let len = calculate_length(&s1);
+
+  // '{}'の長さは、{}です
+  println!("The length of '{}' is {}.", s1, len);
+}
+
+//貸しているだけなので、ムーブは無理
+fn calculate_length(s: &String) -> usize {
+  s.len()
+}
+
+-借用ができないパターン
+fn main(){
+  let s=String::from("hello");
+  change(&s);
+}
+
+fn change(some_string:&String){
+  some_string.push_str(",world"); //エラー
+}
+
+-解決策 ムーブ先で変更可能 可変で貸す
+fn main(){
+  let mut s=String::from("hello");
+  change(&mut s);
+}
+
+fn change(some_string:&mut String){
+  some_string.push_str(",world");
+}
+
+-&で貸す場合r1,r2が競合 スコープの間のみ有効 スコープが違えば借用可能
+fn main(){
+  let mut s=String::from("hello");
+
+  let r1=&mut s;
+  let r2=&mut s; //エラー
+
+  println!("{},{}",r1,r2);
+}
+
+-let r1とr2は不変なので、貸しても同じ値なので問題ないが、r3は可変なので問題。
+fn main(){
+  let mut s=String::from("hello");
+  let r1=&s;
+  let r2=&s;
+  let r3=&mut s;
+}
+
+-宙に浮いた参照
+-dangleはスタック領域なので、ブロックを抜けると
+-ヒープ領域に確保したメモリの値を指し示すことができなくなる。
+-dangle関数を呼んだあとも使われる可能性があるのでコンパイルエラー
+fn main(){
+  let reference_to_nothing=dangle();
+}
+fn dangle()->&String{
+  let s=String::from("hello");
+  &s //借用返している。エラー
+}
+
+-任意のタイミングで1つの可変長参照か不変な参照いくつでも行える
+-参照は常に有効でなければならない。(もう終わった関数にある所有権などは参照できない)
+
+-スライス 以下のように同期がとれていない
+fn first_word(s:&String)->usize{
+  let bytes=s.as_bytes();
+  for(i,&item) in bytes.iter().enumerate(){
+    if item==b' '{
+      return i;
+    }
+  }
+  s.len()
+}
+
+fn main(){
+  let mut s=String::from("hello world");
+  let word=first_word(&s); //word will get the value 5
+                                  //wordの中の値は5になる
+  //この時点で、sとwordと同じ値が二つになり、同期がとれていない
+  s.clear(); //stringを空にする。つまり""と等しくなる。
+}
+
+-スライス
+fn main(){
+  let s=String::from("hello world");
+  let hello=&s[0..5]; //0~5を貸している。
+  let world=&s[6..11]; //6~11を貸している。
+}
+
+-スライスパターン
+let slice=&s[0..2]; //0~2
+let slice=&s[..2]; //0~2
+let slice=&s[3..len]; //3~len 
+let slice=&s[3..]; //3~最後まで
+let slice=&s[..]; //全体
+
+-スライスのメリット &strはスライスを戻り値にしている &Stringも&str全体のスライスなのでどちらでもよい。
+fn first_word(s:&String)->&str{
+  let bytes=s.as_bytes();
+  for(i,&item) in bytes.iter().enumerate(){
+    if item==b' '{
+      return &s[0..i]; //空白があればそこまでを返す
+    }
+  }
+  &s[..] //空白がなければ全体を返す
+}
+
+fn main(){
+  let mut s=String::from("hello world"); //可変
+  let word=first_word(&s);  //不変
+    
+  s.clear();  //可変 エラー
+}
+
+-数字の配列スライスも可能 この場合は&strではなく&[i32]
+let a=[1,2,3,4,5];
+let slice=&a[1..3]; //slice[0]=2,slice[1]=3 1~3未満
+
+
+-構造体
+
+struct User{
+  username:String,
+  email:String,
+  sign_in_count:u64,
+  active:bool,
+}
+
+-構造体を使う
+let user1=User{
+    email:String::from("s"),
+    username:String::from("some"),
+    active:true,
+    sign_in_count:1,
+  };
+-ドットを使うことで入れることができる。しかしlet mutとしなければだめ
+  user1.email=String::from("a");
+
+-構造体を返す関数
+fn build_user(email: String, username: String) -> User {
+    User {
+        email: email,
+        username: username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+
+-省略可能
+fn build_user(email: String, username: String) -> User {
+    User {
+        email,
+        username,
+        active: true,
+        sign_in_count: 1,
+    }
+}
+
+-構造体をコピーすることができる。
+fn main(){
+  let mut user1 = User {
+    email: String::from("someone@example.com"),
+    username: String::from("someusername123"),
+    active: true,
+    sign_in_count: 1,
+};
+ 
+  let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    active: user1.active,
+    sign_in_count: user1.sign_in_count,
+  };
+
+  let user2 = User {
+    email: String::from("another@example.com"),
+    username: String::from("anotherusername567"),
+    ..user1
+  };
+
+}
+
+-タプル構造体
+fn main(){
+  let origin=Point(0,0,0);
+}
+struct Point(i32,i32,i32);
+
+
+-構造体の使用例
+
+
+fn main(){
+  let mut rect=Rectangle{
+    width:30,
+    height:50,
+  };
+
+  
+  println!("{}",area(&rect)); //ムーブしないように借用
+
+  rect.width=30;  //数値を替えれるようになる
+
+}
+
+//ムーブしないように借用
+fn area(rectagle:&Rectangle)->u32{
+  rectagle.height*rectagle.width
+}
+
+
+struct Rectangle{
+  width:u32,
+  height:u32,
+}
+
+-構造体をprintln!にそのまま表示
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50 };
+
+    println!("rect1 is {:?}", rect1);
+}
+
+-implキーワードで、構造体を定義
+impl  Rectangle {
+  fn area(&self)->u32 {
+    self.height*self.width
+  }
+}
+
+
+fn main(){
+  let mut rect=Rectangle{
+    width:30,
+    height:50,
+  };
+
+  
+  println!("{}",rect.area()); //ムーブしないように借用
+
+}
+
+struct Rectangle{
+  width:u32,
+  height:u32,
+}
+
+-構造体を返す
+impl  Rectangle {
+  //Rectangleを返すためRectangleを初期化
+  //正方形は横も縦も同じ長さのため横の長さを受け取って、それぞれの
+  //横縦同じにし返す。
+  fn Square(width:u32)->Self{
+    Self{
+      width,
+      height:width,
+    }
+  }
+  fn area(&self)->u32 {
+    self.height*self.width
+  }
+}
+
+fn main(){
+  let mut rect=Rectangle{
+    width:30,
+    height:50,
+  };
+
+  let square=Rectangle::Square(60);
+
+  
+  println!("{}",square.area()); //ムーブしないように借用
+
+}
+
+struct Rectangle{
+  width:u32,
+  height:u32,
+}
+
+-可変参照を受け取るself
+impl  Rectangle {
+  //中身で自分自身の値を替える場合は&mute selfとかく
+  fn set_width(&mut self,width:u32){
+    self.width=width;
+  }
+}
+
+fn main(){
+  let mut rect=Rectangle{
+    width:30,
+    height:50,
+  };
+
+  rect.set_width(40);
+}
+
+struct Rectangle{
+  width:u32,
+  height:u32,
+}
+
+
+-enum構造体
+enum IpAddrKind{
+  V4,
+  V6,
+}
+
+fn main(){
+  let four=IpAddrKind::V4;
+  let six=IpAddrKind::V6;
+  route(IpAddrKind::V4);
+}
+
+//enumの関数 v4,v6も受け取ることできる。
+fn route(ip_type:IpAddrKind){}
+
+-enumを持つ構造体
+
+struct IpAddr{
+  kind: IpAddrKind,
+  address:String,
+}
+
+-enumにさらにString型を定義
+//enumを定義して
+enum IpAddrKind{
+  V4(String),
+  V6(String),
+}
+fn main(){
+  //Ipaddressカインドの中にString型を持つ
+  let home=IpAddrKind::V4(String::from("127.0.0.1"));
+}
+
+-さらに改良
+//enumを定義して
+enum IpAddrKind{
+  V4(u8,u8,u8,u8),
+  V6(String),
+}
+
+fn main(){
+  //Ipaddressカインドの中にString型を持つ
+  let home=IpAddrKind::V4(127,0,0,1);
+  let loopback=IpAddrKind::V6(String::from("::1"));
+}
+
+-{}を使うとそれ値に名前を付けることができる。
+#[derive(Debug)]
+enum Message{
+  //やめるとき
+  Quit,
+  //動く先
+  Move {x:i32,y:i32},
+  //何を書き込むか
+  Write(String),
+  //色コード
+  ChangeColor(i32,i32,i32),
+}
+
+fn main(){
+  let mut message=Message::Quit;
+  println!("{:?}",message);
+  message=Message::Move { x: 4, y: 3 };
+  println!("{:?}",message);
+  message=Message::Write("aaa".to_string());
+  println!("{:?}",message);
+  message=Message::ChangeColor(200,2,2);
+  println!("{:?}",message);
+}
+
+
+-implも使える
+impl Message{
+  fn show_this_message(&self){
+    println!("{:?}",self);
+  }
+}
+
+fn main(){
+  let mut message=Message::Quit;
+  message.show_this_message();
+}
+
+-デバッグ用にそのような関数がある結果は上記と同じ
+-その値があるかないか
+fn main(){
+  let mut maybe_number=Some(5);
+  println!("{:?}",maybe_number);
+  maybe_number=None;
+  println!("{:?}",maybe_number);
+}
+
+-match式 enumについてすべて定義しないとダメ
+-Yelloを追加すると、定義もしないとダメ
+-enumの値によって変えたい
+#[derive(Debug)]
+enum Color{
+  Red,
+  Blue,
+  Green,
+}
+
+fn color_to_str(color:&Color)->&str{
+  match color{
+    Color::Red=>"#FF0000",
+    Color::Green=>"#00FF00",
+    Color::Blue=>"#0000FF",
+  }
+
+}
+
+fn main(){
+   let green =Color::Green;
+   println!("Gree Color Code:{}",color_to_str(&green));
+}
+
+
+-Someの値によって処理を変える
+#[derive(Debug)]
+enum Color{
+  Red,
+  Blue,
+  Green,
+}
+
+
+
+fn find_maybe_number(maybe_number: Option<u32>) {
+  match maybe_number {
+      Some(number) => println!("Found {}", number),
+      None => println!("Nothing"),
+  }
+}
+
+fn color_to_str(color:&Color)->&str{
+  match color{
+    Color::Red=>"#FF0000",
+    Color::Green=>"#00FF00",
+    Color::Blue=>"#0000FF",
+  }
+
+}
+
+fn main(){
+   let green =Color::Green;
+   find_maybe_number(Some(5));
+}
+
+-if-let文
+-どれか一つのパターンを実行したい
+#[derive(Debug)]
+enum Color{
+  Red,
+  Blue,
+  Green,
+}
+fn find_maybe_number(maybe_number: Option<u32>) {
+  match maybe_number {
+      Some(number) => println!("Found {}", number),
+      None => println!("Nothing"),
+  }
+}
+fn color_to_str(color:&Color)->&str{
+  match color{
+    Color::Red=>"#FF0000",
+    Color::Green=>"#00FF00",
+    Color::Blue=>"#0000FF",
+  }
+
+}
+fn main(){
+   let maybe_number:Option<u32>=Some(6);
+   if let Some(number)=maybe_number{
+    println!("number:{}",number);
+   }else{
+    println!("this is else stmt");
+   }
+}
+
+-いろんなパターンマッチングがある
+
+
+
+-ファイル分割 pub modは同じディレクトリしか無理
+//main.rs
+pub mod second; //モジュールを呼ぶ
+use second::hello;
+fn main(){
+  println!("Hello!");
+  hello();
+}
+
+//second.rs
+//pubをつけるとほかのモジュールから呼べるようになる
+pub fn hello(){
+    println!("Hello!")
+}
+
+-ディレクトリを分ける-main.rsと同じファイルを用意する必要がある
+/main.rs
+pub mod second; //モジュールを呼ぶ
+pub mod third;
+
+use second::hello;
+use third::return_three::return_three;
+fn main(){
+  println!("Hello!");
+  hello();
+  println!("reutrned{}",return_three());
+}
+/second.rs
+//pubをつけるとほかのモジュールから呼べるようになる
+pub fn hello(){
+    println!("Hello!")
+}
+/third.rs
+pub mod return_three;
+/third/return_three.rs
+pub fn return_three()->usize{
+    return 3;
+}
+
+
+-コレクション
+
+-ベクタ  
+let mut v=Vec::new(); //可変にする必要がある
+v.push(5);
+v.push(6);
+v.push(7);
+v.push(8);
+
+-別の書き方 もちろんドロップはあるよ。
+{
+let v=vec![5,6,7,8];
+}
+
+-要素があるかと要素によってマッチさせる
+    let v = vec![1, 2, 3, 4, 5];
+
+    let third: &i32 = &v[2];
+    println!("The third element is {}", third);
+
+    match v.get(2) {
+        //                      "3つ目の要素は{}です"
+        Some(third) => println!("The third element is {}", third),
+        //               "3つ目の要素はありません。"
+        None => println!("There is no third element."),
+    }
+
+
+-ベクタをfor文で回す &v あくまで借りて表示
+let v = vec![100, 32, 57];
+for i in &v {
+    println!("{}", i);
+}
+
+-ベクタの値表示
+let mut v = vec![100, 32, 57];
+for i in &mut v { //可変のv
+    *i += 50; //スターは参照外しで中身を見ることができる。
+}
+
+-enumとベクタの合わせ技
+enum SpreadsheetCell {
+  Int(i32),
+  Float(f64),
+  Text(String),
+}
+
+let row = vec![
+  SpreadsheetCell::Int(3),
+  SpreadsheetCell::Text(String::from("blue")),
+  SpreadsheetCell::Float(10.12),
+];
+
+-詳しくはdocs.rs std::Vecで検索
+-いろんなパターンマッチングがある
+
+
+-文字列(UTF-8)
+-文字列を生成
+let mut s=String::new();
+
+-リテラル(&str型となる)
+let data="initial";
+
+-String型に変換
+let s=data.to_string();
+let s=String::from("initial");
+
+-String型の中身を変更
+let mut s=String::from("foo");
+s.push_str("bar"); //foobar
+
+-char型をpush
+let mut s=String::from("lo");
+s.push('l'); //lol
+
+-ムーブ非推奨
+let s1=String::from("Hello, ");
+let s2=String::from("world!");
+let s3=s1+&s2; //s1はムーブされるのでもう使えない
+
+-わかりやすく結合
+let s1=String::from("tic");
+let s2=String::from("tac");
+let s3=String::from("toe");
+let s=format("{}-{}-{}",s1,s2,s3);
+
+-文字列のスライドはUTF-8なので、必ずしもスライスができるかわからない。
+
+-文字列を走査するメソッド
+for c in "こんちわ".chars(){
+  println!("{}",c);
+}
+
+-1byteずつ取り出したい
+for b in "こんちわ".bytes(){
+  println!("{}",b);
+}
+
+-ハッシュマップ
+-Blueをキーにして10取り出す insertを使ってセットする
+use std::collections::HashMap;
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+-ハッシュマップ所有権
+use std::collections::HashMap;
+
+let field_name = String::from("Favorite color");
+let field_value = String::from("Blue");
+
+let mut map = HashMap::new(); //ここで渡している
+map.insert(field_name, field_value);
+
+
+-Blueのスコアをゲットする
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+let team_name = String::from("Blue");
+let score = scores.get(&team_name);
+
+-for文でイテレータを回す
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+for (key, value) in &scores {
+    println!("{}: {}", key, value);
+}
+
+
+-ハッシュマップの更新
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Blue"), 25);
+
+println!("{:?}", scores);
+
+
+-ハッシュマップの追加や変更を自動でする
+use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+
+scores.entry(String::from("Yellow")).or_insert(50);
+scores.entry(String::from("Blue")).or_insert(50);
+
+println!("{:?}", scores);
+
+
+-ハッシュマップで空白に対して、ハッシュマップを取り出す。
+use std::collections::HashMap;
+
+let text = "hello world wonderful world";
+
+let mut map = HashMap::new();
+
+for word in text.split_whitespace() {
+    let count = map.entry(word).or_insert(0);
+    *count += 1;
+}
+
+println!("{:?}", map);
+
+
+-エラー処理　パニックを起こすことができる。
+fn main() {
+    panic!("crash and burn");  //クラッシュして炎上
+}
+
+-エラー処理　result okの時の処理、errの処理
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+-ファイル処理で実践
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => {
+            // ファイルを開く際に問題がありました
+            panic!("There was a problem opening the file: {:?}", error)
+        },
+    };
+}
+
+-エラーだったらすぐパニック　unwrap
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt").unwrap();
+}
+
+-上記に加えパニックだったら、message
+use std::fs::File;
+
+fn main() {
+    // hello.txtを開くのに失敗しました
+    let f = File::open("hello.txt").expect("Failed to open hello.txt");
+}
+
+
+-?演算子エラーだったら関数の戻り値を返す エラーじゃなかったら、fに入れる。
+-上の階層にエラーを委譲する
+use std::io;
+use std::io::Read;
+use std::fs::File;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut f = File::open("hello.txt")?; 
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    Ok(s)
+}
+
+-理想はresult
+
+
+-ジェネリックス　任意の型
+-型を<T>とすることで、ひろくいろんな方を受け取る関数を作ることができる。
+
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+//例
+fn main() {
+    let both_integer = Point { x: 5, y: 10 };
+    let both_float = Point { x: 1.0, y: 4.0 };
+    let integer_and_float = Point { x: 5, y: 4.0 };
+}
+
+//例
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+
+-トレイト(インターフェース)
+共通の振る舞いを定義する
+
+-ライフタイム
+
+
+-テスト記述
+-cargo test 
+-add_two(2)を入れて4が帰ってきたら成功-ok
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_adds_two() {
+        assert_eq!(4, add_two(2));
+    }
+}
+
+
+-クロージャ
+-環境をキャプチャできる匿名関数
+-関数と違って自動で型を推論してくれる
+-一度型が決まるとその型になる。i32で推論された後f32とかで使えなくなる。
+
+//関数
+fn  add_one_v1   (x: u32) -> u32 { x + 1 }
+//クロージャ
+let add_one_v2 = |x: u32| -> u32 { x + 1 };
+//クロージャ
+let add_one_v3 = |x|             { x + 1 };
+let add_one_v4 = |x|               x + 1  ;
+//xと一緒かどうか判定するクロージャ
+fn main() {
+  let x = 4;
+
+  let equal_to_x = |z| z == x;
+
+  let y = 4;
+
+  println!("equal to x {}",equal_to_x(y));
+}
+
+-イテレータ　ベクタを表示する
+let v1 = vec![1, 2, 3];
+
+let v1_iter = v1.iter();
+
+for val in v1_iter {
+    // {}でした
+    println!("Got: {}", val);
+}
+
+-nextで次のイテレータ
+#[test]
+fn iterator_demonstration() {
+    let v1 = vec![1, 2, 3];
+
+    let mut v1_iter = v1.iter();
+    //テストケース
+    assert_eq!(v1_iter.next(), Some(&1));
+    assert_eq!(v1_iter.next(), Some(&2));
+    assert_eq!(v1_iter.next(), Some(&3));
+    assert_eq!(v1_iter.next(), None);
+}
+
+-イテレータのメソッド
+let total: i32 = v1_iter.sum(); //合計を表示
+
+-イテレータは結合できる .mapでクロージャにより1プラスしたものを返す
+let v1: Vec<i32> = vec![1, 2, 3];
+v1.iter().map(|x| x + 1);
+
+-イテレータVSloopどっちでもいい
+
+
+-パターンマッチング
+match VALUE {
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+    PATTERN => EXPRESSION,
+}
+
+-ifをletに入れる
+fn main() {
+    let favorite_color: Option<&str> = None;
+    let is_tuesday = false;
+    let age: Result<u8, _> = "34".parse();
+
+    if let Some(color) = favorite_color {
+        // あなたのお気に入りの色、{}を背景色に使用します
+        println!("Using your favorite color, {}, as the background", color);
+    } else if is_tuesday {
+        // 火曜日は緑の日！
+        println!("Tuesday is green day!");
+    } else if let Ok(age) = age {
+        if age > 30 {
+            // 紫を背景色に使用します
+            println!("Using purple as the background color");
+        } else {
+            // オレンジを背景色に使用します
+            println!("Using orange as the background color");
+        }
+    } else {
+        // 青を背景色に使用します
+        println!("Using blue as the background color");
+    }
+}
+
+-while let
+-右辺の式が左辺とマッチするたびにprintln!が実行される
+
+let mut stack = Vec::new();
+
+stack.push(1);
+stack.push(2);
+stack.push(3);
+
+while let Some(top) = stack.pop() {
+    println!("{}", top);
+}
+
+-イテレータとindexも一緒に返す　enumerate
+let v = vec!['a', 'b', 'c'];
+
+for (index, value) in v.iter().enumerate() {
+    println!("{} is at index {}", value, index);
+}
+
+
+-一気に代入
+let (x, y, z) = (1, 2, 3);
+
+-一気にタプルの変数を貸して表示
+fn print_coordinates(&(x, y): &(i32, i32)) {
+    // 現在の位置: ({}, {})
+    println!("Current location: ({}, {})", x, y);
+}
+
+fn main() {
+    let point = (3, 5);
+    print_coordinates(&point);
+}
+
+
+-論駁可能性
+-何らかのパターンが合致しないかどうか
+-比較なら左辺が関数でも構わない
+if let Some(x)=some_option_value{
+  println!("{}",x);
+}
+
+
+-リテラルにマッチする
+let x = 1;
+
+match x {
+    1 => println!("one"),       // 1
+    2 => println!("two"),       // 2
+    3 => println!("three"),     // 3
+    _ => println!("anything"),  // なんでも
+}
+
+
+-y=5 Some(y)は何か値がある場合はSome(y)にマッチ
+
+fn main() {
+    let x = Some(5);
+    let y = 10;
+
+    match x {
+        // 50だったよ
+        Some(50) => println!("Got 50"),
+        // マッチしたよ
+        Some(y) => println!("Matched, y = {:?}", y),
+        // 既定のケース
+        _ => println!("Default case, x = {:?}", x),
+    }
+
+    // 最後にはx = {}, y = {}
+    println!("at the end: x = {:?}, y = {:?}", x, y);
+}
+
+-1か2か
+
+let x = 1;
+
+match x {
+    // 1か2
+    1 | 2 => println!("one or two"),
+    // 3
+    3 => println!("three"),
+    // なんでも
+    _ => println!("anything"),
+}
+
+-1~5か
+
+let x = 5;
+
+match x {
+    // 1から5まで
+    1..=5 => println!("one through five"),
+    // それ以外
+    _ => println!("something else"),
+}
+
+-char型も可能
+let x = 'c';
+
+match x {
+    // ASCII文字前半
+    'a'..='j' => println!("early ASCII letter"),
+    // ASCII文字後半
+    'k'..='z' => println!("late ASCII letter"),
+    // それ以外
+    _ => println!("something else"),
+}
+
+-タプルを代入
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 0, y: 7 };
+
+    let Point { x, y } = p;
+    assert_eq!(0, x);
+    assert_eq!(7, y);
+}
+
+-上記に加え、matchも可能
+fn main() {
+    let p = Point { x: 0, y: 7 };
+
+    match p {
+        // x軸上の{}
+        Point { x, y: 0 } => println!("On the x axis at {}", x),
+        // y軸上の{}
+        Point { x: 0, y } => println!("On the y axis at {}", y),
+        // どちらの軸上でもない: ({}, {})
+        Point { x, y } => println!("On neither axis: ({}, {})", x, y),
+    }
+}
+
+-enumも可能
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+fn main() {
+    let msg = Message::ChangeColor(0, 160, 255);
+
+    match msg {
+        Message::Quit => {
+            // Quit列挙子には分配すべきデータがない
+            println!("The Quit variant has no data to destructure.")
+        },
+        Message::Move { x, y } => {
+            println!(
+                // x方向に{}、y方向に{}だけ動く
+                "Move in the x direction {} and in the y direction {}",
+                x,
+                y
+            );
+        }
+        // テキストメッセージ: {}
+        Message::Write(text) => println!("Text message: {}", text),
+        Message::ChangeColor(r, g, b) => {
+            println!(
+                // 色を赤{}, 緑{}, 青{}に変更
+                "Change the color to red {}, green {}, and blue {}",
+                r,
+                g,
+                b
+            )
+        }
+    }
+}
+
+-ワイルドカード Some numbers: 2, 8, 32
+let numbers = (2, 4, 8, 16, 32);
+
+match numbers {
+    (first, _, third, _, fifth) => {
+        // 何らかの数値: {}, {}, {}
+        println!("Some numbers: {}, {}, {}", first, third, fifth)
+    },
+}
+
+-xのみ束縛したい場合
+struct Point {
+    x: i32,
+    y: i32,
+    z: i32,
+}
+
+let origin = Point { x: 0, y: 0, z: 0 };
+
+match origin {
+    Point { x, .. } => println!("x is {}", x),
+}
+
+-最初と最後のみ表示 ..
+fn main() {
+    let numbers = (2, 4, 8, 16, 32);
+
+    match numbers {
+        (first, .., last) => {
+            println!("Some numbers: {}, {}", first, last);
+        },
+    }
+}
+
+-yがfalseなのでno
+-xの値が4、5、6に等しくかつyがtrue
+let x = 4;
+let y = false;
+
+match x {
+    // はい
+    4 | 5 | 6 if y => println!("yes"),
+    // いいえ
+    _ => println!("no"),
+}
+
+
+
+-コマンドライン引数
+-cargo run a A
+-結果
+-["/root/rust_begin/hello_world/target/debug/hello_world", "a", "A"]
+use std::env;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    println!("{:?}", args);
+}
+
+-実際にコマンドライン引数を使ってみる
+-1番目と2番目
+use std::env;
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let query = &args[1];
+    let filename = &args[2];
+
+    // {}を探しています
+    println!("Searching for {}", query);
+    // {}というファイルの中
+    println!("In file {}", filename);
+}
+
+-ファイルを読み込む
+-引数から読み取る
+use std::env;
+use std::fs::File;
+use std::io::prelude::*;
+
+fn main() {
+    // コマンドライン引数からファイル名を取得
+    let args: Vec<String> = env::args().collect();
+
+    // プログラム名と引数が足りない場合はエラーメッセージを表示して終了
+    if args.len() < 2 {
+        eprintln!("Usage: {} <filename>", args[0]);
+        std::process::exit(1);
+    }
+
+    // 引数からファイル名を取得
+    let filename = &args[1];
+
+    println!("In file {}", filename);
+
+    // ファイルが見つかりませんでした
+    let mut f = File::open(filename).expect("file not found");
+
+    let mut contents = String::new();
+    f.read_to_string(&mut contents)
+        // ファイルの読み込み中に問題がありました
+        .expect("something went wrong reading the file");
+
+    // テキストは\n{}です
+    println!("With text:\n{}", contents);
+}
+
+-標準エラー出力 eprintln!
+fn main() {
+    let args: Vec<String> = env::args().collect();
+
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {}", err);
+        process::exit(1);
+    });
+
+    if let Err(e) = minigrep::run(config) {
+        eprintln!("Application error: {}", e);
+
+        process::exit(1);
+    }
+}
+
+
+
